@@ -1,4 +1,5 @@
 import random
+import sys
 
 #checks if the move is valid
 def is_valid_move(board, row, column):
@@ -48,8 +49,7 @@ def execute_tour(p, file):
         file.write(" ".join(str(cell) for cell in row) + "\n")
     return success
 
-#main function
-def main():
+def part1():
     ps = [0.7, 0.8, 0.85]
     for p in ps:
         success_count = 0
@@ -62,6 +62,23 @@ def main():
             probability = success_count / 100000
             file.write(f"LasVegas Algorithm With p = {p}\nNumber of successful tours: {success_count}\n"
                        f"Number of trials: 100000\nProbability of a successful tour: {probability:.5f}")
+            
+def part2(): #not implemented yet
+    return
+
+#main function
+def main():
+    if len(sys.argv) != 2:
+        print("Run format should be as: python knights_tour.py [part1|part2]")
+        sys.exit(1)
+
+    if sys.argv[1] == "part1":
+        part1()
+    elif sys.argv[1] == "part2":
+        part2()
+    else:
+        print("Invalid argument.")
+    
 
 if __name__ == "__main__":
     main()
