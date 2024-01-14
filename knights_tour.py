@@ -3,7 +3,7 @@ import sys
 
 turns = 100000
 ps = [0.7, 0.8, 0.85]
-ks = [0, 2, 3]
+ks = [3, 20, 13]
 
 #checks if the move is valid
 def is_valid_move(board, row, column):
@@ -14,24 +14,30 @@ def is_valid_move(board, row, column):
     return True
 
 #returns a list of possible moves
-def get_possible_moves(board, row, column):
+def get_possible_moves(board, row, column, depth=0):
     moves = [(-2, -1), (-1, -2), (-2, 1), (-1, 2), (1, -2), (2, -1), (1, 2), (2, 1)]
     valid_moves = []
     for move in moves:
         new_row, new_column = row + move[0], column + move[1]
         if is_valid_move(board, new_row, new_column):
             valid_moves.append((new_row, new_column))
+
+    # sort the moves based on the number of possible moves from the new position
+    if depth == 0 : # avoid infinite recursion
+        valid_moves.sort(key=lambda move: len(get_possible_moves(board, move[0], move[1], depth=1)))
+
     return valid_moves
 
-def backtrack_tour(board, row, col, step, target_steps):
+def backtrack_tour(board, row, col, step, target_steps, k):
     if step >= target_steps:  # Target number of steps reached
         return True
 
     for next_row, next_col in get_possible_moves(board, row, col):
         board[next_row][next_col] = step
-        if backtrack_tour(board, next_row, next_col, step + 1, target_steps):
+        if backtrack_tour(board, next_row, next_col, step + 1, target_steps, k):
             return True
-        board[next_row][next_col] = -1  # Backtrack
+        if step > k:
+            board[next_row][next_col] = -1  # Backtrack
 
     return False
 
@@ -76,7 +82,7 @@ def execute_tour_part2(k, p):
         board[row][col] = i + 1  # Set step count on the board
 
     # Now use backtracking from the current position
-    return backtrack_tour(board, row, col, k + 1, target_steps)
+    return backtrack_tour(board, row, col, k + 1, target_steps, k)
 
 
 def part1():
