@@ -1,6 +1,10 @@
 import random
 import sys
 
+turns = 100000
+ps = [0.7, 0.8, 0.85]
+ks = [0, 2, 3]
+
 #checks if the move is valid
 def is_valid_move(board, row, column):
     if row < 0 or row >= 8 or column < 0 or column >= 8:
@@ -34,12 +38,7 @@ def backtrack_tour(board, row, col, step, target_steps):
 #executes the tour
 def execute_tour_part1(p, file):
     #initialize the board
-    board = []
-    for i in range(8):
-        row = []
-        for j in range(8):
-            row.append(-1)
-        board.append(row)
+    board = [[-1 for _ in range(8)] for _ in range(8)]
     row, column = random.randint(0, 7), random.randint(0, 7) #randomly choose a cell
     board[row][column] = 0 #mark the cell as visited
     step = 1 
@@ -69,45 +68,42 @@ def execute_tour_part2(k, p):
     target_steps = round(64 * p)  # Calculate the target steps based on p
 
     # Perform k random steps first
-    for _ in range(k):
+    for i in range(k):
         moves = get_possible_moves(board, row, col)
         if not moves:
             return False  # Dead end reached during random steps
         row, col = random.choice(moves)
-        board[row][col] = _  # Set step count on the board
+        board[row][col] = i + 1  # Set step count on the board
 
     # Now use backtracking from the current position
     return backtrack_tour(board, row, col, k + 1, target_steps)
 
 
 def part1():
-    ps = [0.7, 0.8, 0.85]
     for p in ps:
         success_count = 0
         with open(f'results_{p}.txt', 'w') as file:
-            for i in range(100000): #run 100000 times
+            for i in range(turns): #run 100000 times
                 file.write(f"Run {i+1}:\n")
                 if execute_tour_part1(p, file): #if the tour is successful
                     success_count += 1 
                 file.write("\n")
-            probability = success_count / 100000
+            probability = success_count / turns
             file.write(f"LasVegas Algorithm With p = {p}\n"
                        f"Number of successful tours: {success_count}\n"
-                       f"Number of trials: 100000\n"
+                       f"Number of trials: {turns}\n"
                        f"Probability of a successful tour: {probability:.5f}")
             
 def part2():
     results = {}
-    ps = [0.7, 0.8, 0.85]
-    ks = [0, 2, 3]
 
     for p in ps:
         for k in ks:
             success_count = 0
-            for _ in range(100000):
+            for _ in range(turns):
                 if execute_tour_part2(k, p):
                     success_count += 1
-            probability = success_count / 100000
+            probability = success_count / turns
             results[(p, k)] = (success_count, probability)
 
     for p in ps:
@@ -116,7 +112,7 @@ def part2():
             success_count, probability = results[(p, k)]
             print(f"LasVegas Algorithm With p = {p}, k = {k}\n"
                   f"Number of successful tours: {success_count}\n"
-                  f"Number of trials: 100000\n"
+                  f"Number of trials: {turns}\n"
                   f"Probability of a successful tour: {probability:.5f}\n")
 
 #main function
