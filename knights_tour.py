@@ -1,4 +1,5 @@
 import random
+import sys
 
 #checks if the move is valid
 def is_valid_move(board, row, column):
@@ -18,8 +19,20 @@ def get_possible_moves(board, row, column):
             valid_moves.append((new_row, new_column))
     return valid_moves
 
+def backtrack_tour(board, row, col, step, target_steps):
+    if step >= target_steps:  # Target number of steps reached
+        return True
+
+    for next_row, next_col in get_possible_moves(board, row, col):
+        board[next_row][next_col] = step
+        if backtrack_tour(board, next_row, next_col, step + 1, target_steps):
+            return True
+        board[next_row][next_col] = -1  # Backtrack
+
+    return False
+
 #executes the tour
-def execute_tour(p, file):
+def execute_tour_part1(p, file):
     #initialize the board
     board = []
     for i in range(8):
@@ -48,20 +61,77 @@ def execute_tour(p, file):
         file.write(" ".join(str(cell) for cell in row) + "\n")
     return success
 
-#main function
-def main():
+def execute_tour_part2(k, p):
+    board = [[-1 for _ in range(8)] for _ in range(8)]
+    row, col = random.randint(0, 7), random.randint(0, 7)
+    board[row][col] = 0
+
+    target_steps = round(64 * p)  # Calculate the target steps based on p
+
+    # Perform k random steps first
+    for _ in range(k):
+        moves = get_possible_moves(board, row, col)
+        if not moves:
+            return False  # Dead end reached during random steps
+        row, col = random.choice(moves)
+        board[row][col] = _  # Set step count on the board
+
+    # Now use backtracking from the current position
+    return backtrack_tour(board, row, col, k + 1, target_steps)
+
+
+def part1():
     ps = [0.7, 0.8, 0.85]
     for p in ps:
         success_count = 0
         with open(f'results_{p}.txt', 'w') as file:
             for i in range(100000): #run 100000 times
                 file.write(f"Run {i+1}:\n")
-                if execute_tour(p, file): #if the tour is successful
+                if execute_tour_part1(p, file): #if the tour is successful
                     success_count += 1 
                 file.write("\n")
             probability = success_count / 100000
-            file.write(f"LasVegas Algorithm With p = {p}\nNumber of successful tours: {success_count}\n"
-                       f"Number of trials: 100000\nProbability of a successful tour: {probability:.5f}")
+            file.write(f"LasVegas Algorithm With p = {p}\n"
+                       f"Number of successful tours: {success_count}\n"
+                       f"Number of trials: 100000\n"
+                       f"Probability of a successful tour: {probability:.5f}")
+            
+def part2():
+    results = {}
+    ps = [0.7, 0.8, 0.85]
+    ks = [0, 2, 3]
+
+    for p in ps:
+        for k in ks:
+            success_count = 0
+            for _ in range(100000):
+                if execute_tour_part2(k, p):
+                    success_count += 1
+            probability = success_count / 100000
+            results[(p, k)] = (success_count, probability)
+
+    for p in ps:
+        print(f"--- p = {p} ---")
+        for k in ks:
+            success_count, probability = results[(p, k)]
+            print(f"LasVegas Algorithm With p = {p}, k = {k}\n"
+                  f"Number of successful tours: {success_count}\n"
+                  f"Number of trials: 100000\n"
+                  f"Probability of a successful tour: {probability:.5f}\n")
+
+#main function
+def main():
+    if len(sys.argv) != 2:
+        print("Run format should be as: python knights_tour.py [part1|part2]\n")
+        sys.exit(1)
+
+    if sys.argv[1] == "part1":
+        part1()
+    elif sys.argv[1] == "part2":
+        part2()
+    else:
+        print("Invalid argument.\n")
+    
 
 if __name__ == "__main__":
     main()
