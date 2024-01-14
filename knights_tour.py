@@ -1,5 +1,6 @@
 import random
 import sys
+import time
 
 turns = 100000
 ps = [0.7, 0.8, 0.85]
@@ -87,6 +88,7 @@ def execute_tour_part2(k, p):
 
 def part1():
     for p in ps:
+        start_time = time.time()
         success_count = 0
         with open(f'results_{p}.txt', 'w') as file:
             for i in range(turns): #run 100000 times
@@ -99,18 +101,23 @@ def part1():
                        f"Number of successful tours: {success_count}\n"
                        f"Number of trials: {turns}\n"
                        f"Probability of a successful tour: {probability:.5f}")
+        end_time = time.time()
+        print(f"Execution time for p = {p}: {end_time - start_time:.2f} seconds\n")
             
 def part2():
     results = {}
 
     for p in ps:
         for k in ks:
+            start_time = time.time()
             success_count = 0
             for _ in range(turns):
                 if execute_tour_part2(k, p):
                     success_count += 1
             probability = success_count / turns
             results[(p, k)] = (success_count, probability)
+            end_time = time.time()
+            print(f"Execution time for p = {p}, k = {k}: {end_time - start_time:.2f} seconds\n")
 
     for p in ps:
         print(f"--- p = {p} ---")
