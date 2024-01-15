@@ -29,5 +29,5 @@ The program will execute the Knight's Tour 100,000 times for each specified p va
 
 ## Contact
 For any inquiries, please reach out to:
-Ceylin Gebes - huriye.gebes@std.bogazici.edu.tr
-Damla Kayikci - damla.kayikci@std.bogazici.edu.tr
+- Ceylin Gebes - huriye.gebes@std.bogazici.edu.tr
+- Damla Kayikci - damla.kayikci@std.bogazici.edu.tr
